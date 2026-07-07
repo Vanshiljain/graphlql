@@ -1,4 +1,4 @@
-name: Deploy Backend
+name: Deploy NestJS Backend
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
     environment: ${{ inputs.environment }}
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Select deployment server
@@ -38,7 +38,11 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
-      - name: Deploy application
+      - name: Deploy NestJS Backend
         run: |
-          ssh -i ~/.ssh/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" \
-            "cd /var/www/onereap-backend && git pull origin main && npm install && npm run build && pm2 restart onereap-backend"
+          ssh -i ~/.ssh/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" << 'EOF'
+            cd /var/www/onereap-backend
+            git pull origin main
+            yarn install
+            yarn build
+          EOF
